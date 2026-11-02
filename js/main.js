@@ -13,6 +13,46 @@ const FORM = {
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
+// ---------- click tracking (Google Analytics 4) ----------
+// Paste your GA4 Measurement ID (starts with "G-") to turn on click tracking.
+// Until then track() does nothing, so the site works the same either way.
+const GA_ID = '';
+
+if (GA_ID) {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function gtag() { window.dataLayer.push(arguments); };
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+  document.head.append(s);
+}
+
+function track(name, params = {}) {
+  if (GA_ID && window.gtag) window.gtag('event', name, params);
+}
+
+// Where on the page a click came from: header, hero, demo, footer, etc.
+function placeOf(el) {
+  if (el.closest('.site-header')) return 'header';
+  if (el.closest('.site-footer')) return 'footer';
+  if (el.closest('.hero')) return 'hero';
+  return el.closest('section[id]')?.id || 'page';
+}
+
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href]');
+  if (!a) return;
+  const href = a.getAttribute('href');
+  const where = placeOf(a);
+  if (href === '#demo') track('book_demo_click', { location: where });
+  else if (href === '#work' && a.classList.contains('btn')) track('try_kitchen_click', { location: where });
+  else if (href.startsWith('mailto:')) track('email_click', { location: where });
+  else if (href.startsWith('tel:')) track('phone_click', { location: where });
+  else if (/^https?:/.test(href)) track('walkthrough_open', { location: where, link_url: href });
+});
+
 // ---------- hero countertop swap ----------
 $$('[data-swap-btn]').forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -57,6 +97,7 @@ let started = false;
 async function startStudio() {
   if (started) return;
   started = true;
+  track('start_3d_kitchen');
   const poster = $('#stage-poster');
   const startBtn = $('#stage-start');
   startBtn.disabled = true;
@@ -219,6 +260,7 @@ form.addEventListener('submit', async (e) => {
       }
       throw new Error(msg);
     }
+    track('generate_lead', { form: 'demo_request' });
     form.reset();
     showStatus('ok', `Thanks, ${escapeHtml(data.name.split(' ')[0])}. Your request is in, and we'll email ${escapeHtml(data.email)} within one business day to set up your demo.`);
   } catch (err) {
