@@ -167,10 +167,6 @@ $$('.gallery [data-full]').forEach((b) =>
 lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.close(); });
 
 // ---------- demo request form ----------
-const STATES = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming', 'Outside the U.S.'];
-const stateSel = $('#f-state');
-for (const s of STATES) stateSel.add(new Option(s, s));
-
 const form = $('#quote-form');
 const status = $('#form-status');
 const submitBtn = $('#f-submit');
@@ -186,7 +182,7 @@ form.addEventListener('submit', async (e) => {
   status.hidden = true;
   if (!form.checkValidity()) {
     const bad = form.querySelector(':invalid');
-    showStatus('err', 'Please fill in the highlighted fields: name, company, email, state, project type, timeline, and a short description.');
+    showStatus('err', 'Please add your name and a valid email address.');
     bad?.focus();
     return;
   }
@@ -198,8 +194,7 @@ form.addEventListener('submit', async (e) => {
     if (k === '_honey') continue;
     data[k] = data[k] ? `${data[k]}, ${v}` : v;
   }
-  data.services ||= 'None selected';
-  const subject = `Demo request: ${data.company} (${data.state})`;
+  const subject = `Demo request: ${data.company || data.name}`;
 
   submitBtn.disabled = true;
   submitBtn.textContent = 'Sending…';
@@ -219,7 +214,16 @@ form.addEventListener('submit', async (e) => {
       });
     }
     const json = await res.json().catch(() => ({}));
-    if (!res.ok || json.success === false || json.success === 'false') throw new Error(json.message || res.statusText);
+    if (!res.ok || json.success === false || json.success === 'false') {
+      const msg = json.message || `${res.status} ${res.statusText}`;
+      if (/activat/i.test(msg)) {
+        // FormSubmit holds every submission until the owner clicks the link it emails them.
+        showStatus('err', 'This form is waiting to be switched on. Please email <b>walktheplan3d@gmail.com</b> or call <b>(616) 238-8268</b> for now.');
+        console.warn('FormSubmit:', msg);
+        return;
+      }
+      throw new Error(msg);
+    }
     form.reset();
     showStatus('ok', `Thanks, ${escapeHtml(data.name.split(' ')[0])}. Your request is in, and we'll email ${escapeHtml(data.email)} within one business day to set up your demo.`);
   } catch (err) {

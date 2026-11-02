@@ -441,6 +441,8 @@ form.qform { background: var(--raised); border: 1px solid var(--line); border-ra
 .checks label { display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; font-weight: 500; font-size: 0.9rem; background: var(--bg); cursor: pointer; }
 .checks input { accent-color: var(--accent); width: 16px; height: 16px; }
 .checks label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.req { color: var(--err); font-weight: 600; }
+.req-note { grid-column: 1 / -1; margin: 0; font-size: 0.85rem; color: var(--muted); }
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .form-foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; }
 .form-foot p { color: var(--muted); font-size: var(--step--1); max-width: 46ch; }
