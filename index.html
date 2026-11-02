@@ -1,0 +1,485 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Walk the Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Walk the Plan builds furnished, interactive 3D walkthroughs from your floor plans, so buyers can tour the home and try finish options before you break ground.">
+<meta property="og:title" content="Walk the Plan: 3D walkthroughs for custom home builders">
+<meta property="og:description" content="Furnished, interactive 3D walkthroughs built from your plans. Buyers tour every room and flip between finishes from any phone.">
+<meta property="og:image" content="img/hero-calacatta.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%231e4b7a'/%3E%3Cpath d='M9 31V9h22v22H22' fill='none' stroke='white' stroke-width='3'/%3E%3Ccircle cx='15' cy='25' r='2' fill='white'/%3E%3Ccircle cx='21' cy='19' r='2' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Walk the Plan home">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 34V6h28v28H23" fill="none" stroke="currentColor" stroke-width="3"/><path d="M6 20h9" stroke="currentColor" stroke-width="2"/><circle cx="13" cy="28" r="2.2" fill="currentColor"/><circle cx="19" cy="22.5" r="2.2" fill="currentColor"/><circle cx="25" cy="17" r="2.2" fill="currentColor"/></svg>
+      <span>Walk the Plan</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#why">Why 3D</a>
+      <a href="#work">Our work</a>
+      <a href="#process">How it works</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn-primary" href="#quote">Request a quote</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <p class="eyebrow">3D walkthroughs for custom home builders</p>
+        <h1>Let buyers walk the house <em>before you break ground.</em></h1>
+        <p class="lede">We turn your floor plans into furnished 3D walkthroughs that open on any phone. Buyers tour every room, flip between finishes, and sign with confidence, whether they live across town or across the country.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#quote">Request a quote</a>
+          <a class="btn btn-ghost" href="#work">Try the live kitchen
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          </a>
+        </div>
+        <ul class="hero-facts">
+          <li>Built to your plan's real dimensions</li>
+          <li>Furnished to scale</li>
+          <li>No app to download</li>
+        </ul>
+      </div>
+
+      <div class="sheet" aria-label="Kitchen render with countertop options">
+        <div class="dim dim-x">16'-0"</div>
+        <div class="dim dim-y">14'-0"</div>
+        <div class="sheet-img">
+          <img src="img/hero-calacatta.jpg" alt="3D kitchen with navy shaker cabinets, white Calacatta quartz counters and brass hardware" data-swap="calacatta" width="1600" height="1000">
+          <img src="img/hero-soapstone.jpg" alt="The same kitchen with dark soapstone counters" data-swap="soapstone" data-hidden="true" width="1600" height="1000" loading="lazy">
+        </div>
+        <span class="sheet-tag">KITCHEN · OPTION 2B</span>
+        <div class="swap" role="group" aria-label="Countertop">
+          <span>Countertop</span>
+          <button type="button" data-swap-btn="calacatta" aria-pressed="true"><i style="background:#f1eee8"></i>Calacatta</button>
+          <button type="button" data-swap-btn="soapstone" aria-pressed="false"><i style="background:#3a3f42"></i>Soapstone</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pain points -->
+  <section class="pain section" id="why">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Why builders use 3D</p>
+        <h2>A floor plan asks buyers to imagine. A walkthrough shows them.</h2>
+        <p>Here's where a flat plan costs you time, margin, and deals.</p>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Who you build for">
+        <button type="button" role="tab" id="tab-boutique" aria-controls="panel-boutique" aria-selected="true">Boutique builders</button>
+        <button type="button" role="tab" id="tab-remote" aria-controls="panel-remote" aria-selected="false" tabindex="-1">Out-of-state &amp; second-home buyers</button>
+      </div>
+
+      <div class="pain-grid" role="tabpanel" id="panel-boutique" aria-labelledby="tab-boutique">
+        <article class="pain-item">
+          <span class="tag">A-01</span>
+          <h3>Your buyers can't read a floor plan.</h3>
+          <p>Most people can't picture 14'-0" × 16'-6" from a line drawing. So they ask for another meeting, then another.</p>
+          <p class="fix">A walkthrough answers "how big is it really?" without you in the room.</p>
+        </article>
+        <article class="pain-item">
+          <span class="tag">A-02</span>
+          <h3>Change orders show up after framing.</h3>
+          <p>Many buyers only understand the space once the walls are up. Moving an island or a wall then costs you schedule and margin.</p>
+          <p class="fix">Buyers walk it, and change it, before you order lumber.</p>
+        </article>
+        <article class="pain-item">
+          <span class="tag">A-03</span>
+          <h3>You're up against model homes and design centers.</h3>
+          <p>Production builders can afford staged models and in-house rendering teams. A boutique builder usually can't justify that hire.</p>
+          <p class="fix">Get the same polished presentation, priced per plan, with no one added to payroll.</p>
+        </article>
+        <article class="pain-item">
+          <span class="tag">A-04</span>
+          <h3>Selections drag on for weeks.</h3>
+          <p>Swatches, sample boards, and "can I see it with the darker floor?" emails slow every job down.</p>
+          <p class="fix">Buyers flip between countertop, cabinet, and floor options in the room itself.</p>
+        </article>
+      </div>
+
+      <div class="pain-grid" role="tabpanel" id="panel-remote" aria-labelledby="tab-remote" hidden>
+        <article class="pain-item">
+          <span class="tag">B-01</span>
+          <h3>Your buyer lives 900 miles away.</h3>
+          <p>They can't drive past the lot on a Saturday or sit down with your designer.</p>
+          <p class="fix">Send one link. They tour the home from their couch, on any device.</p>
+        </article>
+        <article class="pain-item">
+          <span class="tag">B-02</span>
+          <h3>Decisions happen over email and PDFs.</h3>
+          <p>A product photo can't show how a dark counter reads next to navy cabinets in afternoon light.</p>
+          <p class="fix">They see each combination in the actual room before they commit.</p>
+        </article>
+        <article class="pain-item">
+          <span class="tag">B-03</span>
+          <h3>Long-distance buyers hesitate to sign.</h3>
+          <p>Signing for a house you've never stood in is a big ask, especially for a second home.</p>
+          <p class="fix">A furnished walkthrough is the next best thing to standing in it.</p>
+        </article>
+        <article class="pain-item">
+          <span class="tag">B-04</span>
+          <h3>Every meeting is a screen share.</h3>
+          <p>Talking someone through a plan over video is slow for both of you, and they forget half of it.</p>
+          <p class="fix">They explore on their own time and come to the call with real questions.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work -->
+  <section class="section" id="work">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Our work</p>
+        <h2>Click around. Change the finishes. This is what your buyers get.</h2>
+        <p>The kitchen below runs live in your browser, built to scale with real-size cabinets, appliances, and furniture. Drag to look around and tap an option to swap it.</p>
+      </div>
+
+      <div class="studio">
+        <div class="stage" id="stage">
+          <canvas id="kitchen" aria-label="Interactive 3D kitchen. Drag to orbit, scroll or pinch to zoom."></canvas>
+          <div class="stage-poster" id="stage-poster" style="background-image:url('img/hero-calacatta.jpg')">
+            <button class="btn btn-primary" type="button" id="stage-start">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>
+              Start the 3D walkthrough
+            </button>
+          </div>
+          <div class="views" id="views" hidden></div>
+          <p class="hint" id="hint" hidden>Drag to look · Scroll or pinch to zoom · Right-drag to move</p>
+        </div>
+
+        <div class="panel" id="panel">
+          <!-- option groups are rendered from js/main.js -->
+          <div class="selsheet" id="selsheet" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="subhead">
+        <h3>Same room, two packages</h3>
+        <p>Drag the handle to compare two finish packages from the same spot. Buyers can make this call before anything is ordered.</p>
+      </div>
+      <div class="compare" id="compare">
+        <img src="img/compare-a.jpg" alt="Kitchen in Package A: alabaster shaker cabinets, Calacatta quartz, polished nickel, white oak floor" width="1600" height="1000" loading="lazy">
+        <img class="after" src="img/compare-b.jpg" alt="Kitchen in Package B: sage cabinets, butcher block counters, brushed brass, walnut floor" width="1600" height="1000" loading="lazy">
+        <div class="handle" aria-hidden="true"></div>
+        <span class="label l">PKG A · Alabaster / Calacatta / Nickel</span>
+        <span class="label r">PKG B · Sage / Butcher block / Brass</span>
+        <input type="range" min="0" max="100" value="50" id="compare-range" aria-label="Compare Package A and Package B">
+      </div>
+
+      <div class="subhead">
+        <h3>Stills and motion for your listings</h3>
+        <p>Every walkthrough comes with high-resolution stills and short clips for your website, MLS listing, and social posts.</p>
+      </div>
+      <div class="gallery">
+        <figure class="wide">
+          <div class="clip">
+            <video autoplay muted loop playsinline preload="metadata" poster="img/orbit-poster.jpg" aria-label="Looping orbit around the furnished kitchen">
+              <source src="img/orbit.webm" type="video/webm">
+              <source src="img/orbit.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption><b>Orbit clip.</b> A 10-second loop sized for social posts and listing headers.</figcaption>
+        </figure>
+        <figure>
+          <button type="button" data-full="img/still-harbor.jpg"><img src="img/still-harbor.jpg" alt="Seated view at the island with navy cabinets and quartz counters" width="1600" height="1000" loading="lazy"></button>
+          <figcaption><b>Harbor.</b> Navy shaker, Calacatta quartz, brass.</figcaption>
+        </figure>
+        <figure>
+          <button type="button" data-full="img/still-farmhouse.jpg"><img src="img/still-farmhouse.jpg" alt="Kitchen with white cabinets, butcher block counters and matte black hardware" width="1600" height="1000" loading="lazy"></button>
+          <figcaption><b>Farmhouse.</b> Alabaster, butcher block, matte black.</figcaption>
+        </figure>
+        <figure>
+          <button type="button" data-full="img/still-coastal.jpg"><img src="img/still-coastal.jpg" alt="Sink view with sage cabinets and polished nickel faucet" width="1600" height="1000" loading="lazy"></button>
+          <figcaption><b>Coastal.</b> Sage green, quartz, polished nickel.</figcaption>
+        </figure>
+        <figure>
+          <button type="button" data-full="img/still-evening.jpg"><img src="img/still-evening.jpg" alt="Kitchen in the evening with pendants and under-cabinet lights on" width="1600" height="1000" loading="lazy"></button>
+          <figcaption><b>Evening.</b> White oak, soapstone, with the lights on.</figcaption>
+        </figure>
+        <figure>
+          <button type="button" data-full="img/still-dining.jpg"><img src="img/still-dining.jpg" alt="Great room view toward the island and refrigerator wall" width="1600" height="1000" loading="lazy"></button>
+          <figcaption><b>Great room view.</b> Concrete counters, porcelain tile.</figcaption>
+        </figure>
+      </div>
+
+      <article class="feature">
+        <div class="feature-copy">
+          <p class="eyebrow">Full-home walkthrough</p>
+          <h3>The Coronado</h3>
+          <p>A complete new-construction plan built from the builder's plan sheets. Every room is to scale and furnished, so you can walk it room by room.</p>
+          <ul>
+            <li>Room-by-room navigation</li>
+            <li>Furniture sized to each room</li>
+            <li>Opens in any browser, phone or desktop</li>
+          </ul>
+          <div><a class="btn btn-primary" href="https://coronado-yorkshire.vercel.app" target="_blank" rel="noopener">Open the walkthrough
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2"/></svg></a></div>
+        </div>
+        <svg class="plan-art" viewBox="0 0 480 320" role="img" aria-label="Simplified floor plan with a dotted walking path from the entry through the great room to the kitchen">
+          <rect class="room" x="30" y="30" width="420" height="260"/>
+          <path class="room" d="M210 30v110M30 170h120M210 190v100M300 140h150M300 140v60"/>
+          <path class="thin" d="M150 170a40 40 0 0 1 40 -40M300 200a30 30 0 0 0 30 30"/>
+          <text class="lbl" x="46" y="56">GREAT ROOM</text>
+          <text class="lbl" x="226" y="56">KITCHEN</text>
+          <text class="lbl" x="316" y="166">OWNER'S SUITE</text>
+          <text class="lbl" x="46" y="196">FOYER</text>
+          <text class="lbl" x="226" y="216">DINING</text>
+          <path class="path" d="M120 290 C120 240 110 210 150 200 S200 150 250 110 S330 100 360 90"/>
+          <circle class="step" cx="120" cy="290" r="6"/>
+          <circle class="step" cx="360" cy="90" r="6"/>
+        </svg>
+      </article>
+    </div>
+  </section>
+
+  <!-- Process -->
+  <section class="band section" id="process">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">How it works</p>
+        <h2>From plan set to shareable link in four steps.</h2>
+        <p>You send plans the way you already have them. We handle the modeling, staging, and setup.</p>
+      </div>
+      <ol class="steps">
+        <li>
+          <h3>Send your plans</h3>
+          <p>PDF plan sheets, CAD files, or builder brochures. Add your selections sheet if you have one.</p>
+        </li>
+        <li>
+          <h3>We build it to scale</h3>
+          <p>Walls, windows, doors, and ceiling heights come straight from your dimensions.</p>
+        </li>
+        <li>
+          <h3>Stage it and add options</h3>
+          <p>We furnish every room with real-size furniture and set up your finish options as one-tap toggles.</p>
+        </li>
+        <li>
+          <h3>Share one link</h3>
+          <p>Buyers open it on any phone or laptop. Put it in your listing, on your website, or in sales emails.</p>
+        </li>
+      </ol>
+      <ul class="included" aria-label="What's included">
+        <li>Interactive walkthrough link</li>
+        <li>Finish toggles for your option packages</li>
+        <li>Furnished, to-scale staging</li>
+        <li>High-resolution stills for listings</li>
+        <li>Short motion clips for social posts</li>
+        <li>Embed code for your own website</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section faq" id="faq">
+    <div class="wrap faq-grid">
+      <div class="section-head">
+        <p class="eyebrow">FAQ</p>
+        <h2>Questions builders ask first.</h2>
+        <p>Don't see yours? Call or email and we'll answer it directly.</p>
+      </div>
+      <div>
+        <details>
+          <summary>What do you need from me?</summary>
+          <p>Your floor plans and elevations, as PDF or CAD. If you offer finish packages, send the selections sheet too and we'll set those up as toggles.</p>
+        </details>
+        <details>
+          <summary>Do buyers need to download anything?</summary>
+          <p>No. The walkthrough opens in a web browser on a phone, tablet, or computer. Buyers tap a link and start walking.</p>
+        </details>
+        <details>
+          <summary>Can I put it on my website or listing?</summary>
+          <p>Yes. You get a link you can share anywhere, plus embed code to place the walkthrough directly on your own site.</p>
+        </details>
+        <details>
+          <summary>Can you model a home that hasn't been built yet?</summary>
+          <p>Yes, that's what it's for. If you have a plan set, we can build the walkthrough.</p>
+        </details>
+        <details>
+          <summary>How long does it take?</summary>
+          <p>It depends on the size of the plan, how many rooms you want furnished, and how many finish options you offer. Your quote includes a delivery date.</p>
+        </details>
+        <details>
+          <summary>What does it cost?</summary>
+          <p>Pricing depends on square footage, furnishing, and the number of finish options. Send a quote request with your plan details and we'll reply with a price.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quote -->
+  <section class="quote section" id="quote">
+    <div class="wrap quote-grid">
+      <div class="contact">
+        <p class="eyebrow">Request a quote</p>
+        <h2>Tell us about your plan.</h2>
+        <p>Share a few details and we'll reply with a price and a delivery date. Prefer to talk? Call or email any time.</p>
+        <div class="contact-lines">
+          <div class="contact-line"><span>Email</span><a href="mailto:walktheplan3d@gmail.com">walktheplan3d@gmail.com</a></div>
+          <div class="contact-line"><span>Phone</span><a href="tel:+16162388268">(616) 238-8268</a></div>
+        </div>
+      </div>
+
+      <form class="qform" id="quote-form" novalidate>
+        <div class="field">
+          <label for="f-name">Your name</label>
+          <input id="f-name" name="name" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="f-company">Company</label>
+          <input id="f-company" name="company" autocomplete="organization" required>
+        </div>
+        <div class="field">
+          <label for="f-email">Email</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="f-phone">Phone <small>(optional)</small></label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label for="f-state">State you build in</label>
+          <select id="f-state" name="state" required><option value="">Choose a state</option></select>
+        </div>
+        <div class="field">
+          <label for="f-buyers">Where are your buyers?</label>
+          <select id="f-buyers" name="buyer_location">
+            <option value="">Choose one</option>
+            <option>Mostly local</option>
+            <option>A mix of local and out-of-state</option>
+            <option>Mostly out-of-state or second-home</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-type">Project type</label>
+          <select id="f-type" name="project_type" required>
+            <option value="">Choose one</option>
+            <option>Custom home for a client</option>
+            <option>Spec home for sale</option>
+            <option>Model home or showcase</option>
+            <option>Plan library (several plans)</option>
+            <option>Remodel or addition</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-style">Floor plan style</label>
+          <select id="f-style" name="plan_style">
+            <option value="">Choose one</option>
+            <option>Single-story ranch</option>
+            <option>Two-story</option>
+            <option>Story-and-a-half</option>
+            <option>Modern farmhouse</option>
+            <option>Modern / contemporary</option>
+            <option>Lake, mountain, or cabin</option>
+            <option>Coastal</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-size">Approximate size</label>
+          <select id="f-size" name="square_feet">
+            <option value="">Choose a range</option>
+            <option>Under 2,000 sq ft</option>
+            <option>2,000 – 3,000 sq ft</option>
+            <option>3,000 – 4,500 sq ft</option>
+            <option>Over 4,500 sq ft</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-volume">Homes you build per year</label>
+          <select id="f-volume" name="homes_per_year">
+            <option value="">Choose a range</option>
+            <option>1 – 5</option>
+            <option>6 – 15</option>
+            <option>16 – 40</option>
+            <option>More than 40</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-timeline">Timeline</label>
+          <select id="f-timeline" name="timeline" required>
+            <option value="">Choose one</option>
+            <option>As soon as possible</option>
+            <option>Within a month</option>
+            <option>1 – 3 months</option>
+            <option>Just exploring</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-plans">Link to plans <small>(optional)</small></label>
+          <input id="f-plans" name="plans_link" type="url" placeholder="Dropbox, Google Drive, or website link">
+        </div>
+        <div class="field full">
+          <fieldset>
+            <legend>What are you interested in? <small>(choose any)</small></legend>
+            <div class="checks">
+              <label><input type="checkbox" name="services" value="Full-home walkthrough" id="s-walk" checked> Full-home walkthrough</label>
+              <label><input type="checkbox" name="services" value="Finish option toggles" id="s-opts"> Finish option toggles</label>
+              <label><input type="checkbox" name="services" value="Furniture staging" id="s-furn"> Furniture staging</label>
+              <label><input type="checkbox" name="services" value="Still renders" id="s-stills"> Still renders</label>
+              <label><input type="checkbox" name="services" value="Motion clips" id="s-clips"> Motion clips</label>
+              <label><input type="checkbox" name="services" value="Exterior and lot" id="s-ext"> Exterior and lot</label>
+            </div>
+          </fieldset>
+        </div>
+        <div class="field full">
+          <label for="f-message">Tell us about the project</label>
+          <textarea id="f-message" name="message" required placeholder="The plan, the buyer, the options you offer, anything that helps us quote it."></textarea>
+        </div>
+        <div class="hp" aria-hidden="true">
+          <label for="f-hp">Leave this empty</label>
+          <input id="f-hp" name="_honey" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="status" id="form-status" role="status" hidden></div>
+        <div class="form-foot">
+          <button class="btn btn-primary" type="submit" id="f-submit">Request a quote</button>
+          <p>Your details go only to Walk the Plan. We'll reply with a price and a delivery date.</p>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 34V6h28v28H23" fill="none" stroke="currentColor" stroke-width="3"/><path d="M6 20h9" stroke="currentColor" stroke-width="2"/><circle cx="13" cy="28" r="2.2" fill="currentColor"/><circle cx="19" cy="22.5" r="2.2" fill="currentColor"/><circle cx="25" cy="17" r="2.2" fill="currentColor"/></svg>
+      <span>Walk the Plan</span>
+    </a>
+    <nav aria-label="Footer">
+      <a href="mailto:walktheplan3d@gmail.com">walktheplan3d@gmail.com</a>
+      <a href="tel:+16162388268">(616) 238-8268</a>
+      <a href="#quote">Request a quote</a>
+    </nav>
+    <p>© <span id="year">2026</span> Walk the Plan</p>
+  </div>
+</footer>
+
+<dialog class="lightbox" id="lightbox">
+  <form method="dialog"><button aria-label="Close">×</button></form>
+  <img alt="">
+</dialog>
+
+<!-- Palette preview: lets you compare color directions. Delete this block (and the .palette CSS) once you pick one. -->
+<div class="palette" id="palette" role="group" aria-label="Color palette preview">
+  <span>Palette</span>
+  <button type="button" data-palette="harbor"><i style="background:#1e4b7a"></i><b>Harbor</b></button>
+  <button type="button" data-palette="lakeshore"><i style="background:#2d6cb5"></i><b>Lakeshore</b></button>
+  <button type="button" data-palette="blueprint"><i style="background:#2456c9"></i><b>Blueprint</b></button>
+</div>
+
+<script type="module" src="js/main.js"></script>
+
+</body></html>
