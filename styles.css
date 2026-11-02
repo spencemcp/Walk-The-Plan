@@ -345,18 +345,6 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .included li { display: flex; gap: 12px; align-items: baseline; padding-block: 10px; border-bottom: 1px dashed color-mix(in srgb, var(--band-ink) 18%, transparent); }
 .included li::before { content: "✓"; color: color-mix(in srgb, var(--accent) 55%, var(--band-ink)); font-weight: 700; }
 
-/* ---------- faq ---------- */
-
-.faq-grid { display: grid; gap: 40px; }
-@media (min-width: 900px) { .faq-grid { grid-template-columns: 0.8fr 1.2fr; } }
-.faq details { border-bottom: 1px solid var(--line); }
-.faq details:first-child { border-top: 1px solid var(--line); }
-.faq summary { cursor: pointer; list-style: none; padding: 20px 40px 20px 0; position: relative; font-weight: 600; font-size: var(--step-1); font-family: var(--display); font-stretch: 104%; letter-spacing: -0.01em; }
-.faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "+"; position: absolute; right: 4px; top: 16px; font: 400 1.6rem/1 var(--body); color: var(--accent); }
-.faq details[open] summary::after { content: "–"; }
-.faq details p { padding: 0 0 22px; color: var(--muted); max-width: 62ch; }
-
 /* ---------- quote ---------- */
 
 .quote { background: var(--surface); border-top: 1px solid var(--line); }
