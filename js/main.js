@@ -1,5 +1,5 @@
 // Walk the Plan site behavior: hero swap, audience tabs, 3D studio,
-// compare slider, lightbox, demo request form, and the palette preview.
+// compare slider, lightbox, and the demo request form.
 
 // ---------- demo request form delivery ----------
 // FormSubmit works with no account: the first submission sends a one-time
@@ -12,11 +12,6 @@ const FORM = {
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
-
-const store = {
-  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch { /* storage blocked */ } },
-};
 
 // ---------- hero countertop swap ----------
 $$('[data-swap-btn]').forEach((btn) => {
@@ -238,17 +233,6 @@ form.addEventListener('submit', async (e) => {
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
-
-// ---------- palette preview ----------
-const root = document.documentElement;
-function setPalette(p) {
-  if (p === 'harbor') root.removeAttribute('data-palette');
-  else root.setAttribute('data-palette', p);
-  $$('#palette button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.palette === p)));
-  store.set('wtp-palette', p);
-}
-$$('#palette button').forEach((b) => b.addEventListener('click', () => setPalette(b.dataset.palette)));
-setPalette(store.get('wtp-palette') || 'harbor');
 
 const year = $('#year');
 if (year) year.textContent = new Date().getFullYear();

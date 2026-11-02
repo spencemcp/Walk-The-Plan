@@ -1,8 +1,7 @@
 /* Walk the Plan
    Layout: architectural sheet. Wide, quiet neutral pages with one blue accent,
    mono dimension strings and plan callouts as the recurring detail, and one dark
-   "drawing set" band for the process. Three candidate palettes share one token
-   set: harbor (default), lakeshore, blueprint. */
+   "drawing set" band for the process. Palette: harbor (navy). */
 
 :root {
   --bg: #f4f2ee;
@@ -36,38 +35,6 @@
   --wrap: 1200px;
 }
 
-:root[data-palette="lakeshore"] {
-  --bg: #f1f4f5;
-  --surface: #e3e9ec;
-  --raised: #fafcfc;
-  --ink: #102029;
-  --muted: #52626b;
-  --line: #cdd7db;
-  --accent: #2d6cb5;
-  --accent-ink: #ffffff;
-  --accent-soft: #d9e6f4;
-  --band: #16303f;
-  --band-ink: #edf3f6;
-  --band-muted: #a6bac5;
-  --scene: #dfe5e8;
-}
-
-:root[data-palette="blueprint"] {
-  --bg: #fbfaf7;
-  --surface: #efede6;
-  --raised: #ffffff;
-  --ink: #0d1b2e;
-  --muted: #4f5b6b;
-  --line: #dad6cc;
-  --accent: #2456c9;
-  --accent-ink: #ffffff;
-  --accent-soft: #dee6f8;
-  --band: #0f2340;
-  --band-ink: #eef2fa;
-  --band-muted: #9fb0cf;
-  --scene: #ebe8e0;
-}
-
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #121820; --surface: #1a222c; --raised: #1f2833; --ink: #ece8e1; --muted: #a3acb7;
@@ -75,16 +42,6 @@
     --band: #0b1118; --band-ink: #ece8e1; --band-muted: #95a1ae; --scene: #1c242e;
     --ok: #7fc596; --err: #f09a8b;
     color-scheme: dark;
-  }
-  :root[data-palette="lakeshore"]:not([data-theme="light"]) {
-    --bg: #0f171c; --surface: #172229; --raised: #1c2930; --ink: #e6eef1; --muted: #9fb0b8;
-    --line: #26343c; --accent: #72a7e8; --accent-ink: #0b141a; --accent-soft: #1a2e44;
-    --band: #0a1216; --band-ink: #e6eef1; --band-muted: #93a6b0; --scene: #18232a;
-  }
-  :root[data-palette="blueprint"]:not([data-theme="light"]) {
-    --bg: #0b1424; --surface: #122036; --raised: #172741; --ink: #eef1f6; --muted: #a0abbd;
-    --line: #22324c; --accent: #85a5f2; --accent-ink: #0a1222; --accent-soft: #1a2b4f;
-    --band: #060d1a; --band-ink: #eef1f6; --band-muted: #93a1ba; --scene: #13213a;
   }
 }
 
@@ -94,16 +51,6 @@
   --band: #0b1118; --band-ink: #ece8e1; --band-muted: #95a1ae; --scene: #1c242e;
   --ok: #7fc596; --err: #f09a8b;
   color-scheme: dark;
-}
-:root[data-theme="dark"][data-palette="lakeshore"] {
-  --bg: #0f171c; --surface: #172229; --raised: #1c2930; --ink: #e6eef1; --muted: #9fb0b8;
-  --line: #26343c; --accent: #72a7e8; --accent-ink: #0b141a; --accent-soft: #1a2e44;
-  --band: #0a1216; --band-ink: #e6eef1; --band-muted: #93a6b0; --scene: #18232a;
-}
-:root[data-theme="dark"][data-palette="blueprint"] {
-  --bg: #0b1424; --surface: #122036; --raised: #172741; --ink: #eef1f6; --muted: #a0abbd;
-  --line: #22324c; --accent: #85a5f2; --accent-ink: #0a1222; --accent-soft: #1a2b4f;
-  --band: #060d1a; --band-ink: #eef1f6; --band-muted: #93a1ba; --scene: #13213a;
 }
 
 /* ---------- base ---------- */
@@ -458,21 +405,6 @@ form.qform { background: var(--raised); border: 1px solid var(--line); border-ra
 .site-footer nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
 .site-footer a { color: var(--muted); text-decoration: none; }
 .site-footer a:hover { color: var(--ink); }
-
-/* ---------- palette preview (remove before launch) ---------- */
-
-.palette {
-  position: fixed; z-index: 70;
-  right: calc(16px + env(safe-area-inset-right, 0px));
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  display: flex; align-items: center; gap: 4px; padding: 5px;
-  background: var(--raised); border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 10px 30px rgb(0 0 0 / 0.18);
-}
-.palette span { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 0 6px 0 8px; }
-.palette button { border: 0; background: transparent; color: var(--ink); font: 500 0.8rem/1 var(--body); padding: 7px 10px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
-.palette button i { width: 12px; height: 12px; border-radius: 50%; }
-.palette button[aria-pressed="true"] { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
-@media (max-width: 520px) { .palette span { display: none; } .palette button b { display: none; } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
