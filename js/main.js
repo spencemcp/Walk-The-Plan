@@ -16,7 +16,7 @@ const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 // ---------- click tracking (Google Analytics 4) ----------
 // Paste your GA4 Measurement ID (starts with "G-") to turn on click tracking.
 // Until then track() does nothing, so the site works the same either way.
-const GA_ID = '';
+const GA_ID = 'G-C3ZYR74EF9';
 
 if (GA_ID) {
   window.dataLayer = window.dataLayer || [];
