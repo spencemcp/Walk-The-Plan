@@ -1,7 +1,7 @@
 // Walk the Plan site behavior: hero swap, audience tabs, 3D studio,
-// compare slider, lightbox, quote form, and the palette preview.
+// compare slider, lightbox, demo request form, and the palette preview.
 
-// ---------- quote form delivery ----------
+// ---------- demo request form delivery ----------
 // FormSubmit works with no account: the first submission sends a one-time
 // "activate" email to the address below; click it and every later inquiry is
 // delivered. To switch to Web3Forms instead, paste your access key here.
@@ -166,7 +166,7 @@ $$('.gallery [data-full]').forEach((b) =>
 );
 lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.close(); });
 
-// ---------- quote form ----------
+// ---------- demo request form ----------
 const STATES = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming', 'Outside the U.S.'];
 const stateSel = $('#f-state');
 for (const s of STATES) stateSel.add(new Option(s, s));
@@ -199,7 +199,7 @@ form.addEventListener('submit', async (e) => {
     data[k] = data[k] ? `${data[k]}, ${v}` : v;
   }
   data.services ||= 'None selected';
-  const subject = `Quote request: ${data.company} (${data.state})`;
+  const subject = `Demo request: ${data.company} (${data.state})`;
 
   submitBtn.disabled = true;
   submitBtn.textContent = 'Sending…';
@@ -221,13 +221,13 @@ form.addEventListener('submit', async (e) => {
     const json = await res.json().catch(() => ({}));
     if (!res.ok || json.success === false || json.success === 'false') throw new Error(json.message || res.statusText);
     form.reset();
-    showStatus('ok', `Thanks, ${escapeHtml(data.name.split(' ')[0])}. Your request is in, and we'll reply to ${escapeHtml(data.email)} with a quote.`);
+    showStatus('ok', `Thanks, ${escapeHtml(data.name.split(' ')[0])}. Your request is in, and we'll email ${escapeHtml(data.email)} within one business day to set up your demo.`);
   } catch (err) {
     console.error(err);
     showStatus('err', 'Your request didn\'t go through. Please try again, or email <b>walktheplan3d@gmail.com</b> or call <b>(616) 238-8268</b>.');
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Request a quote';
+    submitBtn.textContent = 'Request a demo';
   }
 });
 
