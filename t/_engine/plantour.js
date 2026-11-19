@@ -646,8 +646,8 @@ export function createTour(canvas, plan, { onChange } = {}) {
     // tile backsplash runs full height behind the hood
     box(g, w + 0.1, top - Ht - BASE.top * FT - 0.02, 0.01, mat.splash, cx, (Ht + top) / 2, 0.006, { cast: false });
   }
-  function sinkUnit(g, cx, cz, w, faucetSide = -1) {
-    const y = (BASE.h + BASE.top) * FT;
+  function sinkUnit(g, cx, cz, w, faucetSide = -1, top = BASE.top) {
+    const y = (BASE.h + top) * FT;
     box(g, w, 0.006, 0.42, mat.darkSteel, cx, y + 0.002, cz, { cast: false });
     box(g, 0.02, 0.008, 0.42, mat.steel, cx, y + 0.004, cz, { cast: false });
     const f = new THREE.Group();
@@ -719,7 +719,7 @@ export function createTour(canvas, plan, { onChange } = {}) {
     for (let i = 0; i < pts.length - 1; i++) {
       const { g, L } = frame(pen.pts[i], pen.pts[i + 1]);
       baseBlock(g, 0, L, { back: true });
-      for (const s of pen.sinks || []) if (s.seg === i) sinkUnit(g, s.at * L, (BASE.depth * FT) / 2, s.w * FT, -1);
+      for (const s of pen.sinks || []) if (s.seg === i) sinkUnit(g, s.at * L, (BASE.depth * FT) / 2, s.w * FT, -1, BASE.top * 1.3);
       if ((pen.overhang?.[i] ?? 0) > 0.5) {
         const n = Math.max(1, Math.floor(L / 0.62));
         for (let k = 0; k < n; k++) stoolSpots.push({ g, x: (L / n) * (k + 0.5), z: -(pen.overhang[i] * FT) - 0.18 });
@@ -770,7 +770,8 @@ export function createTour(canvas, plan, { onChange } = {}) {
       box(root, run + 0.02, 0.04, Z1 - Z0, mat.floor, X0 + run * (i + 0.5), y, (Z0 + Z1) / 2);
       box(root, 0.02, rise, Z1 - Z0, mat.trim, X0 + run * i + 0.01, y + rise / 2, (Z0 + Z1) / 2);
     }
-    const deep = n * rise + 2.4;
+    const deep = n * rise + 0.5;
+    box(root, X1 - X0, 0.04, Z1 - Z0, mat.well, (X0 + X1) / 2, -deep, (Z0 + Z1) / 2, { cast: false });
     box(root, X1 - X0, deep, 0.02, mat.well, (X0 + X1) / 2, -deep / 2, Z0, { cast: false });
     box(root, X1 - X0, deep, 0.02, mat.well, (X0 + X1) / 2, -deep / 2, Z1, { cast: false });
     box(root, 0.02, deep, Z1 - Z0, mat.well, X1, -deep / 2, (Z0 + Z1) / 2, { cast: false });
@@ -939,10 +940,10 @@ export function createTour(canvas, plan, { onChange } = {}) {
 
   // ---------- lighting ----------
 
-  const hemi = new THREE.HemisphereLight('#f3f6ff', '#b8a58c', 0.55);
+  const hemi = new THREE.HemisphereLight('#f3f6ff', '#b8a58c', 0.3);
   scene.add(hemi);
   const C = P(...(plan.center || [15, 15]));
-  const sun = new THREE.DirectionalLight('#fff1dc', 2.2);
+  const sun = new THREE.DirectionalLight('#fff1dc', 2.6);
   const sd = plan.sun || [-7, 11, -5];
   sun.position.set(C.x + sd[0], sd[1], C.y + sd[2]);
   sun.target.position.set(C.x, 0, C.y);
@@ -954,7 +955,7 @@ export function createTour(canvas, plan, { onChange } = {}) {
   sun.shadow.bias = -0.0004;
   sun.shadow.normalBias = 0.02;
   scene.add(sun, sun.target);
-  const fill = new THREE.DirectionalLight('#ffffff', 0.55);
+  const fill = new THREE.DirectionalLight('#ffffff', 0.25);
   fill.position.set(C.x + 6, 6, C.y + 7);
   scene.add(fill);
   // a few soft evening lights at the recessed cans
@@ -1001,13 +1002,13 @@ export function createTour(canvas, plan, { onChange } = {}) {
       const eve = v === 'evening';
       mat.sky.map = skyTex(eve);
       mat.sky.needsUpdate = true;
-      sun.intensity = eve ? 0.25 : 2.2;
+      sun.intensity = eve ? 0.25 : 2.6;
       sun.color.set(eve ? '#ff9a62' : '#fff1dc');
-      hemi.intensity = eve ? 0.07 : 0.55;
-      fill.intensity = eve ? 0.04 : 0.55;
+      hemi.intensity = eve ? 0.06 : 0.3;
+      fill.intensity = eve ? 0.03 : 0.25;
       scene.background.set(eve ? '#22262d' : '#e9e6e0');
-      for (const m of Object.values(mat)) if ('envMapIntensity' in m) m.envMapIntensity = eve ? 0.22 : 1;
-      renderer.toneMappingExposure = eve ? 1.3 : 1.0;
+      for (const m of Object.values(mat)) if ('envMapIntensity' in m) m.envMapIntensity = eve ? 0.18 : 0.55;
+      renderer.toneMappingExposure = eve ? 1.25 : 0.92;
       for (const pl of pendantLights) pl.intensity = eve ? 5 : 0;
       for (const pl of canLights) pl.intensity = eve ? 3.2 : 0;
       for (const pl of lampLights) pl.intensity = eve ? 4 : 0;
@@ -1081,6 +1082,8 @@ export function createTour(canvas, plan, { onChange } = {}) {
       if (tween.t >= 1) tween = null;
     }
     controls.update();
+    const high = camera.position.y > 3.6;
+    for (const s of skies) s.visible = !high;
     renderer.render(scene, camera);
     requestAnimationFrame(loop);
   }

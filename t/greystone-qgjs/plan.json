@@ -31,12 +31,12 @@
       "picks": { "cabinets": "charcoal", "counters": "concrete", "floor": "tile", "hardware": "black", "paint": "cool" } }
   ],
   "views": {
-    "kitchen": { "name": "Kitchen", "p": [14.5, 15.6], "t": [4, 22.5], "tz": 3.6 },
+    "kitchen": { "name": "Kitchen", "p": [18.5, 14.2], "z": 5.6, "t": [4, 22.5], "tz": 3.2 },
     "sink": { "name": "From the sink", "p": [6.2, 22.6], "t": [16, 10.5], "tz": 4 },
-    "great": { "name": "Great room", "p": [14.2, 16.2], "t": [22, 1.5], "tz": 4.5 },
+    "great": { "name": "Great room", "p": [27.6, 16.0], "z": 5.6, "t": [17.5, 3], "tz": 4.2 },
     "dining": { "name": "Dining", "p": [26, 15], "t": [3, 8], "tz": 3.8 },
     "entry": { "name": "Front entry", "p": [14.6, 33], "t": [16, 12], "tz": 4.3 },
-    "overview": { "name": "Overview", "p": [42, 46], "z": 44, "t": [15, 14], "tz": 0 }
+    "overview": { "name": "Overview", "p": [36, 40], "z": 34, "t": [15, 15], "tz": 0 }
   },
   "floors": [
     { "pts": [[0, 5], [12, 5], [12, 0], [29, 0], [29, 20.5], [17.1, 20.5], [17.1, 34], [12.2, 34], [12.2, 28.25], [0, 28.25]],
@@ -95,7 +95,7 @@
     { "type": "chair", "x": 15.6, "y": 7.2, "rot": 90 },
     { "type": "chair", "x": 25.4, "y": 7.2, "rot": -90 },
     { "type": "coffee", "x": 20.5, "y": 8.4, "args": [4.2, 2.4] },
-    { "type": "lamp", "x": 25.9, "y": 13.2 },
+    { "type": "lamp", "x": 15.3, "y": 13.4 },
     { "type": "plant", "x": 13.3, "y": 1.6 },
     { "type": "plant", "x": 28.0, "y": 1.6 },
     { "type": "rug", "x": 6, "y": 10.6, "args": [10, 8] },
