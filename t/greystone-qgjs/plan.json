@@ -1,0 +1,108 @@
+{
+  "meta": {
+    "plan": "Greystone",
+    "title": "The Greystone",
+    "eyebrow": "Concept walkthrough",
+    "subtitle": "Prepared for Capital Homes · 1 story · 2,043 sq ft · main living area",
+    "note": "Built from the Greystone floor plan on the Capital Homes website. The room sizes come from that plan. Everything else is estimated, so treat this as a concept, not a construction document.",
+    "approx": [
+      "From the plan: great room 17' × 17' with a 10' ceiling, dining room 12' × 11', kitchen 12' × 12', and where each room sits.",
+      "Estimated: wall thickness, window and door sizes and positions, and a 9' ceiling outside the great room.",
+      "Estimated: cabinet sizes, appliances and the exact peninsula shape. The layout follows the plan drawing.",
+      "Only the main living area is modeled. Bedrooms, baths and the garage are closed off, and the stair is shown only at the top.",
+      "The three finish packages are stock examples, not Capital Homes selections. Furniture is illustrative."
+    ]
+  },
+  "center": [15, 16],
+  "sun": [-6, 12, -4],
+  "options": {
+    "counters": ["calacatta", "quartzwhite", "soapstone", "concrete", "butcher"],
+    "cabinets": ["alabaster", "oak", "charcoal", "navy", "sage"],
+    "floor": ["whiteoak", "walnut", "greige", "tile"],
+    "hardware": ["brass", "black", "nickel"],
+    "paint": ["softwhite", "greige", "cool"]
+  },
+  "packages": [
+    { "id": "airy", "name": "Light & airy", "desc": "Alabaster shaker, Calacatta-look quartz, white oak, nickel",
+      "picks": { "cabinets": "alabaster", "counters": "calacatta", "floor": "whiteoak", "hardware": "nickel", "paint": "softwhite" } },
+    { "id": "warm", "name": "Warm classic", "desc": "White oak cabinets, soapstone, walnut floors, brass",
+      "picks": { "cabinets": "oak", "counters": "soapstone", "floor": "walnut", "hardware": "brass", "paint": "greige" } },
+    { "id": "modern", "name": "Modern contrast", "desc": "Charcoal shaker, honed concrete, porcelain tile, matte black",
+      "picks": { "cabinets": "charcoal", "counters": "concrete", "floor": "tile", "hardware": "black", "paint": "cool" } }
+  ],
+  "views": {
+    "kitchen": { "name": "Kitchen", "p": [14.5, 15.6], "t": [4, 22.5], "tz": 3.6 },
+    "sink": { "name": "From the sink", "p": [6.2, 22.6], "t": [16, 10.5], "tz": 4 },
+    "great": { "name": "Great room", "p": [14.2, 16.2], "t": [22, 1.5], "tz": 4.5 },
+    "dining": { "name": "Dining", "p": [26, 15], "t": [3, 8], "tz": 3.8 },
+    "entry": { "name": "Front entry", "p": [14.6, 33], "t": [16, 12], "tz": 4.3 },
+    "overview": { "name": "Overview", "p": [42, 46], "z": 44, "t": [15, 14], "tz": 0 }
+  },
+  "floors": [
+    { "pts": [[0, 5], [12, 5], [12, 0], [29, 0], [29, 20.5], [17.1, 20.5], [17.1, 34], [12.2, 34], [12.2, 28.25], [0, 28.25]],
+      "holes": [[[18.9, 16.8], [26.1, 16.8], [26.1, 20.3], [18.9, 20.3]]] }
+  ],
+  "ceilings": [
+    { "h": 9, "pts": [[0, 5], [12, 5], [12, 28.25], [0, 28.25]], "cans": [[3.5, 19], [3.5, 23], [7.5, 22.5], [7.5, 26], [3, 7.5], [9, 7.5]] },
+    { "h": 10, "pts": [[12, 0], [29, 0], [29, 17], [12, 17]], "cans": [[15, 4], [26, 4], [15, 13], [26, 13]] },
+    { "h": 9, "pts": [[12, 17], [29, 17], [29, 20.5], [17.1, 20.5], [17.1, 34], [12, 34]], "cans": [[14.6, 19], [14.6, 26], [14.6, 32]] }
+  ],
+  "soffits": [
+    { "a": [12, 5], "b": [12, 17], "y0": 9, "y1": 10 },
+    { "a": [12, 17], "b": [29, 17], "y0": 9, "y1": 10 }
+  ],
+  "walls": [
+    { "a": [11.5, -0.25], "b": [29.4, -0.25], "h": 10, "out": -1, "t": 0.5,
+      "openings": [ { "type": "window", "o": 2.3, "w": 3.5, "sill": 2, "head": 8 }, { "type": "window", "o": 12.2, "w": 3.5, "sill": 2, "head": 8 } ] },
+    { "a": [11.75, -0.5], "b": [11.75, 5.25], "h": 10, "out": 1, "t": 0.5 },
+    { "a": [-0.5, 4.75], "b": [12, 4.75], "h": 9, "out": -1, "t": 0.5,
+      "openings": [ { "type": "slider", "o": 3.0, "w": 6, "head": 6.83 } ] },
+    { "a": [-0.25, 4.5], "b": [-0.25, 28.5], "h": 9, "out": 1, "t": 0.5,
+      "openings": [ { "type": "window", "o": 4.0, "w": 3, "sill": 2.5, "head": 6.83 } ] },
+    { "a": [29.2, -0.5], "b": [29.2, 20.7], "h": 10, "t": 0.4,
+      "openings": [ { "type": "door", "o": 13.5, "w": 2.8 } ] },
+    { "a": [17.1, 20.5], "b": [29.4, 20.5], "h": 9, "t": 0.4 },
+    { "a": [26.1, 16.8], "b": [29.2, 16.8], "h": 10, "t": 0.33 },
+    { "a": [26.1, 16.7], "b": [26.1, 20.5], "h": 9, "t": 0.33 },
+    { "a": [-0.5, 28.25], "b": [12.4, 28.25], "h": 9, "t": 0.5 },
+    { "a": [12.2, 24.8], "b": [12.2, 34.2], "h": 9, "t": 0.4,
+      "openings": [ { "type": "door", "o": 6.2, "w": 2.5 } ] },
+    { "a": [17.1, 20.3], "b": [17.1, 34.2], "h": 9, "t": 0.4,
+      "openings": [ { "type": "door", "o": 6.5, "w": 2.5 } ] },
+    { "a": [12, 34.2], "b": [17.3, 34.2], "h": 9, "out": 1, "t": 0.5,
+      "openings": [ { "type": "front", "o": 1.15, "w": 3 } ] },
+    { "a": [0, 24.2], "b": [2.6, 24.2], "h": 9, "t": 0.33 },
+    { "a": [2.6, 24.2], "b": [4.4, 26.0], "h": 9, "t": 0.33, "openings": [ { "type": "door", "o": 0.07, "w": 2.4 } ] },
+    { "a": [4.4, 26.0], "b": [4.4, 28.1], "h": 9, "t": 0.33 }
+  ],
+  "fireplace": { "a": [18, 0], "b": [23, 0], "h": 10, "d": 1.5 },
+  "stair": { "x0": 18.9, "x1": 26.1, "y0": 16.8, "y1": 20.3, "steps": 9, "rails": ["north"] },
+  "kitchen": {
+    "runs": [
+      { "a": [0, 24.0], "b": [0, 16.6], "ceiling": 9, "items": [ { "type": "range", "o": 2.4, "w": 2.5 } ] },
+      { "a": [9, 28.0], "b": [4.6, 28.0], "ceiling": 9 }
+    ],
+    "fridge": { "a": [12, 28.0], "b": [9, 28.0], "ceiling": 9 },
+    "peninsula": {
+      "pts": [[6, 16.2], [8.8, 16.2], [12.0, 19.4], [12.0, 23.4]],
+      "overhang": [1.0, 1.0, 0],
+      "sinks": [ { "seg": 1, "at": 0.5, "w": 2.6 } ]
+    }
+  },
+  "furniture": [
+    { "type": "rug", "x": 20.5, "y": 8.6, "args": [10, 12] },
+    { "type": "sofa", "x": 20.5, "y": 12.8, "rot": 180, "args": [8, 3.2] },
+    { "type": "chair", "x": 15.6, "y": 7.2, "rot": 90 },
+    { "type": "chair", "x": 25.4, "y": 7.2, "rot": -90 },
+    { "type": "coffee", "x": 20.5, "y": 8.4, "args": [4.2, 2.4] },
+    { "type": "lamp", "x": 25.9, "y": 13.2 },
+    { "type": "plant", "x": 13.3, "y": 1.6 },
+    { "type": "plant", "x": 28.0, "y": 1.6 },
+    { "type": "rug", "x": 6, "y": 10.6, "args": [10, 8] },
+    { "type": "dining", "x": 6, "y": 10.6, "args": [6.5, 3.4, 6] },
+    { "type": "chandelier", "x": 6, "y": 10.6, "args": [9] },
+    { "type": "pendant", "x": 9.5, "y": 17.7, "args": [9] },
+    { "type": "pendant", "x": 10.6, "y": 18.8, "args": [9] },
+    { "type": "console", "x": 16.4, "y": 30.5, "rot": -90, "args": [4] }
+  ]
+}
