@@ -8,6 +8,10 @@ header (see `vercel.json`). Move a tour onto the public site only once that buil
 ## Files
 
 - `_engine/plantour.js`: the 3D engine (walls, openings, floors, ceilings, kitchen, stair, furniture, finishes, lighting).
+- `_engine/walk.js`: eye-level walking. A grid built from the floor outline and every wall, cabinet and
+  furniture footprint keeps the camera inside the house; tap or click the floor to walk, drag to look.
+- `_engine/models/`: glTF furniture from the Khronos glTF Sample Assets (CC BY 4.0 and CC0). Keep the
+  credit line in `plan.json` `meta.credits` for any tour that uses them.
 - `_engine/ui.js` and `_engine/tour.css`: title card, design packages, finish swatches, views.
 - `_engine/shot.mjs`: renders stills for the email and the report.
 - `<slug>/index.html`: copy from `greystone-qgjs/`, change only the plan path and the title.
@@ -21,7 +25,9 @@ header (see `vercel.json`). Move a tour onto the public site only once that buil
    - `walls` with their openings (window, slider, door, front, opening), `floors`, `ceilings`, `soffits`.
    - `kitchen`: wall runs, range, fridge, island or peninsula, sink.
    - `fireplace` and `stair` if the plan has them, then `furniture`.
-   - `views` (kitchen and great room at least) and `meta` (title, what is from the plan and what is estimated).
+   - `views`: standing spots at eye level (`p` where you stand, `t` and `tz` what you look at), kitchen and
+     great room at least, all on open floor. The first one is where the tour opens.
+   - `meta` (title, what is from the plan and what is estimated, model credits).
 4. Check every view locally, then render stills with `shot.mjs` for each package.
 5. Push to a branch, check the Vercel preview, and merge only when the link is going into an email.
 
