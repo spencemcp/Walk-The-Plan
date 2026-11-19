@@ -950,6 +950,7 @@ export function createTour(canvas, plan, { onChange } = {}) {
   sun.shadow.mapSize.set(2048, 2048);
   const sb = 8;
   Object.assign(sun.shadow.camera, { left: -sb, right: sb, top: sb, bottom: -sb, near: 0.5, far: 40 });
+  sun.shadow.camera.updateProjectionMatrix();
   sun.shadow.bias = -0.0004;
   sun.shadow.normalBias = 0.02;
   scene.add(sun, sun.target);

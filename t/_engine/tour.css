@@ -76,3 +76,4 @@ body.noui .title, body.noui .views, body.noui .panel, body.noui .foot, body.noui
   .foot { display: none; }
   .hint { display: none; }
 }
+.err { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 420px; padding: 16px 18px; font-size: 14px; z-index: 10; }

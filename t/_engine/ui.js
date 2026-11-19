@@ -9,6 +9,15 @@ const el = (tag, attrs = {}, ...kids) => {
   return e;
 };
 
+function showError(msg) {
+  const d = document.createElement('div');
+  d.className = 'err glass';
+  d.textContent = 'This walkthrough could not start on this device (' + msg + '). Try Chrome, Safari or Edge on a phone or computer.';
+  document.body.append(d);
+}
+window.addEventListener('error', (e) => showError(e.message));
+window.addEventListener('unhandledrejection', (e) => showError(String(e.reason?.message || e.reason)));
+
 export async function boot(planUrl = './plan.json') {
   const plan = await (await fetch(planUrl, { cache: 'no-cache' })).json();
   const q = new URLSearchParams(location.search);
