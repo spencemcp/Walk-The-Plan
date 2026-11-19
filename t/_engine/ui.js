@@ -37,6 +37,7 @@ export async function boot(planUrl = './plan.json') {
   const note = el('dialog', { class: 'note glass' });
   note.innerHTML = `<h3>About this walkthrough</h3><p>${plan.meta.note}</p>` +
     (plan.meta.approx?.length ? `<ul>${plan.meta.approx.map((a) => `<li>${a}</li>`).join('')}</ul>` : '') +
+    (plan.meta.credits ? `<p class="credits">${plan.meta.credits}</p>` : '') +
     `<form method="dialog"><button>Close</button></form>`;
   document.body.append(note);
   info.addEventListener('click', () => note.showModal());
@@ -102,9 +103,12 @@ export async function boot(planUrl = './plan.json') {
     vBtns[id] = b;
   }
   document.body.append(views);
-  const hint = el('div', { class: 'hint glass' }, 'Drag to look around · Scroll or pinch to zoom · Right-drag to move');
+  const touch = matchMedia('(pointer: coarse)').matches;
+  const hint = el('div', { class: 'hint glass' }, touch
+    ? 'Drag to look around · Tap the floor to walk there'
+    : 'Drag to look around · Click the floor to walk there · W A S D to step');
   document.body.append(hint);
-  setTimeout(() => (hint.style.opacity = 0), 6000);
+  setTimeout(() => (hint.style.opacity = 0), 9000);
   const foot = el('div', { class: 'foot' });
   foot.innerHTML = plan.meta.footer || 'Built by <a href="https://walktheplan3d.com/" target="_blank" rel="noopener">Walk the Plan</a>';
   document.body.append(foot);
