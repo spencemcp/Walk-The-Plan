@@ -26,6 +26,18 @@ export async function boot(planUrl = './plan.json') {
   const canvas = el('canvas', { id: 'tour', 'aria-label': `Interactive 3D concept walkthrough of the ${plan.meta.plan}` });
   document.body.append(canvas);
 
+  // loading screen: stays up until everything is on the GPU, so the first
+  // drag is smooth
+  const bar = el('i');
+  const status = el('div', { class: 'ls' }, 'Loading');
+  const loading = el('div', { class: 'loading', role: 'status', 'aria-live': 'polite' },
+    el('div', { class: 'eyebrow' }, plan.meta.eyebrow || 'Concept walkthrough'),
+    el('div', { class: 'lt' }, plan.meta.title),
+    el('div', { class: 'track' }, bar),
+    status);
+  document.body.append(loading);
+  const progress = (f, label) => { bar.style.width = `${Math.round(f * 100)}%`; if (label) status.textContent = label; };
+
   // title
   const info = el('button', { class: 'info', type: 'button' }, 'What is exact and what is estimated');
   document.body.append(el('header', { class: 'title glass' },
@@ -108,7 +120,7 @@ export async function boot(planUrl = './plan.json') {
     ? 'Drag to look around · Tap the floor to walk there'
     : 'Drag to look around · Click the floor to walk there · W A S D to step');
   document.body.append(hint);
-  setTimeout(() => (hint.style.opacity = 0), 9000);
+  hint.style.opacity = 0;
   const foot = el('div', { class: 'foot' });
   foot.innerHTML = plan.meta.footer || 'Built by <a href="https://walktheplan3d.com/" target="_blank" rel="noopener">Walk the Plan</a>';
   document.body.append(foot);
@@ -127,11 +139,18 @@ export async function boot(planUrl = './plan.json') {
     document.body.classList.toggle('evening', s.time === 'evening');
   }
 
-  const tour = createTour(canvas, plan, { onChange: (s) => mark(s) });
+  const tour = createTour(canvas, plan, { onChange: (s) => mark(s), onProgress: progress });
   if (q.get('pkg')) tour.choosePackage(q.get('pkg'));
   if (q.get('time')) tour.set('time', q.get('time'));
   if (q.get('view')) tour.setView(q.get('view'), true);
   mark();
   window.__tour = tour;
+  tour.ready.then(() => {
+    progress(1, 'Ready');
+    loading.classList.add('done');
+    setTimeout(() => loading.remove(), 700);
+    hint.style.opacity = 1;
+    setTimeout(() => (hint.style.opacity = 0), 9000);
+  });
   return tour;
 }

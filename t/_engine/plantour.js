@@ -14,6 +14,7 @@ import { EffectComposer } from '/vendor/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from '/vendor/jsm/postprocessing/RenderPass.js';
 import { GTAOPass } from '/vendor/jsm/postprocessing/GTAOPass.js';
 import { OutputPass } from '/vendor/jsm/postprocessing/OutputPass.js';
+import { mergeGeometries } from '/vendor/jsm/utils/BufferGeometryUtils.js';
 import { buildGrid, createWalker } from './walk.js';
 
 const FT = 0.3048;
@@ -407,13 +408,22 @@ function offsetPolyline(pts, offs) {
 
 // ---------- the tour ----------
 
-export function createTour(canvas, plan, { onChange } = {}) {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+export function createTour(canvas, plan, { onChange, onProgress } = {}) {
+  const Q = new URLSearchParams(location.search);
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  // keeping the drawing buffer costs a lot on phones; only the render script needs it
+  const keepBuffer = navigator.webdriver || Q.has('shot');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: keepBuffer, powerPreference: 'high-performance' });
+  const maxPR = Math.min(window.devicePixelRatio, coarse ? 1.5 : 1.75);
+  renderer.setPixelRatio(maxPR);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // nothing in the house moves, so shadows are drawn once and redrawn only on changes
+  renderer.shadowMap.autoUpdate = false;
+  let needRender = 2;
+  const invalidate = (shadows = false) => { needRender = Math.max(needRender, 2); if (shadows) renderer.shadowMap.needsUpdate = true; };
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#e9e6e0');
@@ -421,8 +431,6 @@ export function createTour(canvas, plan, { onChange } = {}) {
   scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
 
   const camera = new THREE.PerspectiveCamera(58, 1, 0.05, 120);
-  const coarse = matchMedia('(pointer: coarse)').matches;
-  const Q = new URLSearchParams(location.search);
 
   const texCache = {};
   const getTex = (k) => {
@@ -451,7 +459,7 @@ export function createTour(canvas, plan, { onChange } = {}) {
     black: new THREE.MeshStandardMaterial({ color: '#141414', roughness: 0.6 }),
     toe: new THREE.MeshStandardMaterial({ color: '#1a1a1a', roughness: 0.9 }),
     splash: new THREE.MeshStandardMaterial({ roughness: 0.25 }),
-    glass: new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 0.02, transmission: 1, transparent: true, opacity: 0.12 }),
+    glass: new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 0.02, transparent: true, opacity: 0.12, depthWrite: false }),
     sky: new THREE.MeshBasicMaterial({ map: skyTex(false), toneMapped: false }),
     shade: new THREE.MeshStandardMaterial({ color: '#1f2226', roughness: 0.4, metalness: 0.4, side: THREE.DoubleSide }),
     bulb: new THREE.MeshStandardMaterial({ color: '#fff3d6', emissive: '#ffd59a', emissiveIntensity: 0 }),
@@ -944,6 +952,11 @@ export function createTour(canvas, plan, { onChange } = {}) {
       const b2 = new THREE.Box3().setFromObject(o);
       const c = b2.getCenter(new THREE.Vector3());
       o.position.set(-c.x, y - b2.min.y, -c.z);
+      // models can carry their own little lights (the plant has fireflies);
+      // each one would cost every pixel, so drop them
+      const extra = [];
+      o.traverse((m) => { if (m.isLight) extra.push(m); });
+      for (const l of extra) l.parent.remove(l);
       o.traverse((m) => {
         if (!m.isMesh) return;
         m.castShadow = true;
@@ -962,18 +975,28 @@ export function createTour(canvas, plan, { onChange } = {}) {
             if (t.sheen && mm.sheenColor) mm.sheenColor.set(t.sheen);
             mm.needsUpdate = true;
           }
+          // real refraction renders the whole house a second time every frame;
+          // see-through glass looks the same at this size
+          if (mm.transmission > 0) {
+            mm.transmission = 0;
+            mm.transparent = true;
+            mm.opacity = Math.min(mm.opacity, 0.3);
+            mm.depthWrite = false;
+            mm.needsUpdate = true;
+          }
           if ('envMapIntensity' in mm) { mm.envMapIntensity = envNow; modelMats.add(mm); }
         }
       });
       if (placeholder) g.remove(placeholder);
       g.add(o);
+      invalidate(true);
     }).catch((e) => console.warn('model', file, e.message));
     loads.push(p);
     return p;
   }
   const modelMats = new Set();
   let envNow = 0.55;
-  const stub = (g) => { const h = new THREE.Group(); g.add(h); return h; };
+  const stub = (g) => { const h = new THREE.Group(); h.userData.keep = true; g.add(h); return h; };
 
   const F = {
     sofa(g, w = 7.5, d = 3.2) {
@@ -1185,6 +1208,7 @@ export function createTour(canvas, plan, { onChange } = {}) {
   // ---------- options & packages ----------
 
   const state = {};
+  const skyMaps = { day: mat.sky.map };
   const apply = {
     counters(v) {
       const o = CATALOG.counters.values[v];
@@ -1214,7 +1238,8 @@ export function createTour(canvas, plan, { onChange } = {}) {
     paint(v) { mat.wall.color.set(CATALOG.paint.values[v].color); },
     time(v) {
       const eve = v === 'evening';
-      mat.sky.map = skyTex(eve);
+      skyMaps[v] ??= skyTex(eve);
+      mat.sky.map = skyMaps[v];
       mat.sky.needsUpdate = true;
       sun.intensity = eve ? 0.25 : 2.6;
       sun.color.set(eve ? '#ff9a62' : '#fff1dc');
@@ -1226,10 +1251,11 @@ export function createTour(canvas, plan, { onChange } = {}) {
       mat.steel.envMapIntensity = eve ? 0.5 : 1.25;
       for (const m of modelMats) m.envMapIntensity = envNow;
       renderer.toneMappingExposure = eve ? 1.25 : 0.92;
-      for (const pl of pendantLights) pl.intensity = eve ? 5 : 0;
-      for (const pl of canLights) pl.intensity = eve ? 3.2 : 0;
-      for (const pl of lampLights) pl.intensity = eve ? 4 : 0;
-      for (const pl of fireLights) pl.intensity = eve ? 6 : 0;
+      // point lights cost every pixel something even when dark, so by day they're off
+      for (const pl of pendantLights) { pl.intensity = eve ? 5 : 0; pl.visible = eve; }
+      for (const pl of canLights) { pl.intensity = eve ? 3.2 : 0; pl.visible = eve; }
+      for (const pl of lampLights) { pl.intensity = eve ? 4 : 0; pl.visible = eve; }
+      for (const pl of fireLights) { pl.intensity = eve ? 6 : 0; pl.visible = eve; }
       mat.bulb.emissiveIntensity = eve ? 3 : 0;
       mat.fire.emissiveIntensity = eve ? 2.2 : 0;
       mat.fire.color.set(eve ? '#2a1a10' : '#121110');
@@ -1242,17 +1268,62 @@ export function createTour(canvas, plan, { onChange } = {}) {
     if (!apply[group] || !CATALOG[group].values[value]) return;
     state[group] = value;
     apply[group](value);
+    invalidate(group === 'time');
     if (!silent) onChange?.({ ...state });
   }
-  function choosePackage(id) {
+  function choosePackage(id, silent) {
     const pk = plan.packages.find((p) => p.id === id);
     if (!pk) return;
     for (const [k, v] of Object.entries(pk.picks)) set(k, v, true);
     state.package = id;
-    onChange?.({ ...state });
+    if (!silent) onChange?.({ ...state });
   }
   choosePackage(plan.packages[0].id);
   set('time', 'day', true);
+
+  // ---------- merge static pieces ----------
+  // ~650 small meshes become a few dozen: one per material per few meters, so a
+  // phone draws far fewer batches while off-screen parts are still skipped.
+  (function bakeStatic() {
+    root.updateMatrixWorld(true);
+    const skip = new Set(strips);
+    const buckets = new Map();
+    const CELL = 3.5;
+    const walk = (o) => {
+      for (const c of [...o.children]) {
+        if (c.userData.keep) continue;
+        if (c.isMesh && !skip.has(c) && c.visible && !Array.isArray(c.material) && !c.material.transparent &&
+            !c.renderOrder && !c.geometry.morphAttributes?.position && c.geometry.attributes.position) {
+          const g = c.geometry;
+          const names = Object.keys(g.attributes).sort().join(',');
+          const cen = new THREE.Vector3().setFromMatrixPosition(c.matrixWorld);
+          const key = [c.material.uuid, c.castShadow, c.receiveShadow, names, !!g.index,
+            Math.floor(cen.x / CELL), Math.floor(cen.z / CELL)].join('|');
+          let b = buckets.get(key);
+          if (!b) buckets.set(key, (b = { m: c.material, cast: c.castShadow, recv: c.receiveShadow, list: [] }));
+          b.list.push(c);
+        }
+        walk(c);
+      }
+    };
+    walk(root);
+    let merged = 0;
+    for (const b of buckets.values()) {
+      if (b.list.length < 2) continue;
+      const geos = b.list.map((m) => { const g = m.geometry.clone(); g.clearGroups(); g.applyMatrix4(m.matrixWorld); return g; });
+      const g = mergeGeometries(geos, false);
+      if (!g) continue;
+      for (const m of b.list) m.parent.remove(m);
+      for (const x of geos) x.dispose();
+      const mesh = new THREE.Mesh(g, b.m);
+      mesh.castShadow = b.cast;
+      mesh.receiveShadow = b.recv;
+      mesh.matrixAutoUpdate = false;
+      root.add(mesh);
+      merged += b.list.length;
+    }
+    if (Q.has('debug')) console.log('merged', merged, 'meshes into', [...buckets.values()].filter((b) => b.list.length > 1).length);
+  })();
 
   // ---------- walking camera ----------
 
@@ -1293,30 +1364,95 @@ export function createTour(canvas, plan, { onChange } = {}) {
     } catch (e) { console.warn('AO off', e.message); composer = null; }
   }
 
+  let pr = maxPR;
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     if (!w || !h) return;
-    const pr = renderer.getPixelRatio();
     if (canvas.width !== Math.floor(w * pr) || canvas.height !== Math.floor(h * pr)) {
+      renderer.setPixelRatio(pr);
       renderer.setSize(w, h, false);
       composer?.setPixelRatio(pr);
       composer?.setSize(w, h);
       camera.aspect = w / h;
       if (!camera.userData.fovSet) camera.fov = w / h < 0.8 ? 74 : 62;
       camera.updateProjectionMatrix();
+      invalidate();
     }
   }
-  let last = performance.now();
+  // render only when the view or the house changed; a still phone stays cool,
+  // which keeps it from slowing down mid-drag
+  const sig = new Float32Array(9), prevSig = new Float32Array(9);
+  let preparing = true, last = performance.now(), slow = 0, fast = 0, lastDrawn = false;
   function loop(now) {
-    const dt = Math.min(0.05, (now - last) / 1000);
+    requestAnimationFrame(loop);
+    const raw = now - last;
+    const dt = Math.min(0.05, raw / 1000);
     last = now;
     resize();
     walker.step(dt);
+    const p = camera.position, q = camera.quaternion;
+    sig.set([p.x, p.y, p.z, q.x, q.y, q.z, q.w, camera.fov, camera.aspect]);
+    let moved = false;
+    for (let i = 0; i < 9; i++) if (Math.abs(sig[i] - prevSig[i]) > 1e-6) { moved = true; break; }
+    if (preparing || !(moved || needRender > 0)) { lastDrawn = false; return; }
+    prevSig.set(sig);
+    if (needRender > 0) needRender--;
     if (composer) composer.render(dt); else renderer.render(scene, camera);
-    requestAnimationFrame(loop);
+    // if the phone can't keep up while moving, draw fewer pixels rather than drop frames
+    if (lastDrawn && moved) {
+      if (raw > 30) { slow++; fast = 0; } else { fast++; slow = Math.max(0, slow - 1); }
+      if (slow > 20 && pr > 1) { pr = Math.max(1, +(pr - 0.25).toFixed(2)); slow = 0; resize(); }
+    }
+    lastDrawn = true;
   }
   requestAnimationFrame(loop);
 
-  const ready = Promise.all(loads).then(() => new Promise((r) => setTimeout(r, 50)));
-  return { set, choosePackage, setView, get state() { return { ...state }; }, cats, camera, scene, walker, grid, ready };
+  // Get everything onto the GPU before the first look around: models,
+  // textures for every finish, and the shaders for each package by day and
+  // evening. Otherwise each first sight of something new stalls the drag.
+  async function prepare() {
+    let done = 0;
+    const total = loads.length + 4;
+    const tick = (label) => { done++; onProgress?.(Math.min(1, done / total), label); };
+    onProgress?.(0, 'Loading furniture');
+    await Promise.all(loads.map((p) => p.then(() => tick('Loading furniture'))));
+    await new Promise((r) => setTimeout(r, 0));
+    const keepState = { ...state };
+    const compile = async () => {
+      if (renderer.compileAsync) await renderer.compileAsync(scene, camera);
+      else renderer.compile(scene, camera);
+    };
+    tick('Preparing finishes');
+    for (const t of ['day', 'evening']) {
+      set('time', t, true);
+      for (const pk of plan.packages) { choosePackage(pk.id, true); await compile(); }
+      for (const k of Object.keys(plan.options || {})) {
+        for (const v of plan.options[k]) { set(k, v, true); }
+        await compile();
+      }
+    }
+    tick('Preparing finishes');
+    const texes = new Set();
+    scene.traverse((o) => {
+      if (!o.isMesh) return;
+      for (const m of [].concat(o.material)) for (const k in m) if (m[k]?.isTexture) texes.add(m[k]);
+    });
+    for (const t of Object.values(texCache)) texes.add(t);
+    for (const t of Object.values(skyMaps)) texes.add(t);
+    for (const t of texes) renderer.initTexture(t);
+    tick('Setting up the rooms');
+    for (const [k, v] of Object.entries(keepState)) if (apply[k]) set(k, v, true);
+    if (keepState.package) state.package = keepState.package;
+    state.view = keepState.view;
+    await compile();
+    renderer.shadowMap.needsUpdate = true;
+    preparing = false;
+    invalidate();
+    // two real frames so the first touch lands on a warm renderer
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    tick('Ready');
+    onChange?.({ ...state });
+  }
+  const ready = new Promise((r) => setTimeout(r, 0)).then(prepare);
+  return { set, choosePackage, setView, get state() { return { ...state }; }, cats, camera, scene, renderer, walker, grid, ready, invalidate };
 }

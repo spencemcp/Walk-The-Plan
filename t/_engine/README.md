@@ -32,3 +32,13 @@ header (see `vercel.json`). Move a tour onto the public site only once that buil
 5. Push to a branch, check the Vercel preview, and merge only when the link is going into an email.
 
 Never use the builder's logo or brand marks, and never put numbers in a tour that the plan does not give.
+
+## Phone performance (Nov 20)
+
+- A loading screen stays up until models, every finish texture and the shaders for each package (day and evening) are on the GPU, so the first drag doesn't stall.
+- Static pieces are merged per material per 3.5 m cell (about 650 meshes become about 170, roughly 135 draw calls).
+- Shadows are drawn once and only redrawn when something changes (a model loads, the time of day changes).
+- Frames are drawn only when the view or the house changes. If a phone can't keep up while moving, the pixel ratio steps down (never below 1).
+- No refraction (transmission) on glass; point lights are only switched on in the evening; lights bundled inside models are removed.
+- Phones skip the backdrop blur on the panels.
+- Drag-to-look eases toward the finger, glides briefly after a flick, and keeps turning after a pinch when one finger stays down.

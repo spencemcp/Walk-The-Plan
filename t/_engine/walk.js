@@ -168,6 +168,10 @@ const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 export function createWalker({ camera, canvas, grid, eye, pickRoot, isPickable = () => true, scene }) {
   const pos = new THREE.Vector2();
   let yaw = 0, pitch = 0, eyeY = eye;
+  // look targets: a drag moves the target and the view eases toward it, so an
+  // uneven stream of touch events still turns the camera smoothly
+  let yawT = 0, pitchT = 0, easing = false, spinV = 0, tiltV = 0;
+  const PITCH_MIN = -1.2, PITCH_MAX = 1.05;
   let route = null; // { pts, i, speed, yawTo, pitchTo, yaw0, pitch0, total, done }
   const keys = new Set();
   const ray = new THREE.Raycaster();
@@ -195,6 +199,7 @@ export function createWalker({ camera, canvas, grid, eye, pickRoot, isPickable =
     pos.copy(n);
     if (yawV !== undefined) yaw = yawV;
     if (pitchV !== undefined) pitch = pitchV;
+    yawT = yaw; pitchT = pitch; easing = false; spinV = tiltV = 0;
     route = null;
     apply();
   }
@@ -218,6 +223,7 @@ export function createWalker({ camera, canvas, grid, eye, pickRoot, isPickable =
     let total = 0, prev = pos.clone();
     for (const q of pts) { total += prev.distanceTo(q); prev = q; }
     if (total < 0.05 && !look) return false;
+    easing = false; spinV = tiltV = 0; yawT = yaw; pitchT = pitch;
     route = { pts, i: 0, total, run: 0, yaw0: yaw, pitch0: pitch, look, speed: Math.min(2.4, 1.3 + total * 0.12) };
     if (look) {
       const a = lookAngles(goal, look);
@@ -228,13 +234,16 @@ export function createWalker({ camera, canvas, grid, eye, pickRoot, isPickable =
   }
 
   function step(dt) {
+    if (pendingHover) { hover(pendingHover); pendingHover = null; }
     // keyboard
     if (keys.size) {
       route = null;
+      easing = false; spinV = tiltV = 0;
       const f = (keys.has('w') || keys.has('arrowup') ? 1 : 0) - (keys.has('s') || keys.has('arrowdown') ? 1 : 0);
       const st = (keys.has('d') ? 1 : 0) - (keys.has('a') ? 1 : 0);
       const turn = (keys.has('arrowleft') || keys.has('q') ? 1 : 0) - (keys.has('arrowright') || keys.has('e') ? 1 : 0);
       yaw += turn * dt * 1.6;
+      yawT = yaw; pitchT = pitch;
       if (f || st) {
         // forward (-sin, -cos), right (cos, -sin)
         const sp = 1.5 * dt;
@@ -255,8 +264,25 @@ export function createWalker({ camera, canvas, grid, eye, pickRoot, isPickable =
         const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
         yaw = r.yaw0 + (r.yawTo - r.yaw0) * e;
         pitch = r.pitch0 + (r.pitchTo - r.pitch0) * e;
+        yawT = yaw; pitchT = pitch;
       }
       if (r.i >= r.pts.length) route = null;
+    }
+    // glide after a flick, then ease the view onto its target
+    if (!drag && (spinV || tiltV)) {
+      yawT += spinV * dt;
+      pitchT = THREE.MathUtils.clamp(pitchT + tiltV * dt, PITCH_MIN, PITCH_MAX);
+      const k = Math.exp(-dt * 6);
+      spinV *= k; tiltV *= k;
+      if (Math.abs(spinV) < 0.02 && Math.abs(tiltV) < 0.02) spinV = tiltV = 0;
+    }
+    if (easing) {
+      const k = 1 - Math.exp(-dt * 22);
+      yaw += (yawT - yaw) * k;
+      pitch += (pitchT - pitch) * k;
+      if (!drag && !spinV && !tiltV && Math.abs(yawT - yaw) < 1e-4 && Math.abs(pitchT - pitch) < 1e-4) {
+        yaw = yawT; pitch = pitchT; easing = false;
+      }
     }
     if (markerFade > 0) {
       markerFade = Math.max(0, markerFade - dt);
@@ -275,7 +301,11 @@ export function createWalker({ camera, canvas, grid, eye, pickRoot, isPickable =
 
   // ---------- input ----------
   const ptrs = new Map();
-  let drag = null, pinch = null, hovering = false;
+  let drag = null, pinch = null, hovering = false, pendingHover = null;
+  const startDrag = (x, y, t, moved = false) => {
+    drag = { x, y, t, yaw: yawT, pitch: pitchT, moved, hist: [{ x, y, t }] };
+    spinV = tiltV = 0;
+  };
   const ndc = (e) => {
     const r = canvas.getBoundingClientRect();
     return new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
@@ -308,10 +338,11 @@ export function createWalker({ camera, canvas, grid, eye, pickRoot, isPickable =
   canvas.style.touchAction = 'none';
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   canvas.addEventListener('pointerdown', (e) => {
-    canvas.setPointerCapture?.(e.pointerId);
+    try { canvas.setPointerCapture(e.pointerId); } catch {}
     ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (ptrs.size === 1) {
-      drag = { x: e.clientX, y: e.clientY, t: e.timeStamp, yaw, pitch, moved: false };
+      yawT = yaw; pitchT = pitch;
+      startDrag(e.clientX, e.clientY, e.timeStamp);
     } else if (ptrs.size === 2) {
       drag = null;
       const [a, b] = [...ptrs.values()];
@@ -320,12 +351,8 @@ export function createWalker({ camera, canvas, grid, eye, pickRoot, isPickable =
   });
   canvas.addEventListener('pointermove', (e) => {
     if (!ptrs.has(e.pointerId)) {
-      if (e.pointerType === 'mouse') {
-        const t = floorTarget(e);
-        hovering = !!t;
-        if (t) { showMarker(t.p, 0); marker.visible = true; ringMat.opacity = 0.85; discMat.opacity = t.floor ? 0.18 : 0.08; }
-        else marker.visible = false;
-      }
+      // hover marker: one raycast per frame at most
+      if (e.pointerType === 'mouse') pendingHover = { clientX: e.clientX, clientY: e.clientY };
       return;
     }
     ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -339,25 +366,57 @@ export function createWalker({ camera, canvas, grid, eye, pickRoot, isPickable =
     }
     if (!drag) return;
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (!drag.moved && Math.hypot(dx, dy) > 6) { drag.moved = true; hovering = false; marker.visible = false; }
+    const slop = e.pointerType === 'mouse' ? 5 : 9;
+    if (!drag.moved && Math.hypot(dx, dy) > slop) {
+      // start turning from here, so the view doesn't jump by the slop distance
+      drag.moved = true; hovering = false; marker.visible = false;
+      drag.x = e.clientX; drag.y = e.clientY;
+      return;
+    }
     if (!drag.moved) return;
     // drag the scene: content follows the finger
     const k = THREE.MathUtils.degToRad(camera.fov) / canvas.clientHeight;
-    yaw = drag.yaw + dx * k;
-    pitch = THREE.MathUtils.clamp(drag.pitch + dy * k, -1.25, 1.1);
+    yawT = drag.yaw + dx * k;
+    pitchT = THREE.MathUtils.clamp(drag.pitch + dy * k, PITCH_MIN, PITCH_MAX);
+    easing = true;
+    drag.hist.push({ x: e.clientX, y: e.clientY, t: e.timeStamp });
+    if (drag.hist.length > 8) drag.hist.shift();
     if (route) { route.yawTo = undefined; }
   });
   const end = (e) => {
     const had = ptrs.has(e.pointerId);
     ptrs.delete(e.pointerId);
-    if (ptrs.size < 2) pinch = null;
     if (!had) return;
+    if (pinch) {
+      // pinch over: let the finger still down keep turning, without a jump
+      pinch = null;
+      drag = null;
+      if (ptrs.size === 1) { const [p] = [...ptrs.values()]; startDrag(p.x, p.y, e.timeStamp, true); }
+      return;
+    }
     if (drag && !drag.moved && e.type === 'pointerup' && e.button !== 2) {
       const t = floorTarget(e);
       if (t && walkTo(t.p)) showMarker(route.pts[route.pts.length - 1], 0.9);
+    } else if (drag && drag.moved && e.type === 'pointerup') {
+      // a flick keeps turning a little and glides to a stop
+      const h = drag.hist, a = h[0], b = h[h.length - 1];
+      const ms = b.t - a.t, idle = e.timeStamp - b.t;
+      if (h.length > 2 && ms > 8 && idle < 60) {
+        const k = THREE.MathUtils.degToRad(camera.fov) / canvas.clientHeight;
+        spinV = THREE.MathUtils.clamp(((b.x - a.x) / ms) * 1000 * k, -4, 4);
+        tiltV = THREE.MathUtils.clamp(((b.y - a.y) / ms) * 1000 * k, -2, 2) * 0.5;
+        if (Math.abs(spinV) < 0.3) spinV = 0;
+        if (Math.abs(tiltV) < 0.3) tiltV = 0;
+      }
     }
     drag = null;
   };
+  function hover(e) {
+    const t = floorTarget(e);
+    hovering = !!t;
+    if (t) { showMarker(t.p, 0); marker.visible = true; ringMat.opacity = 0.85; discMat.opacity = t.floor ? 0.18 : 0.08; }
+    else marker.visible = false;
+  }
   canvas.addEventListener('pointerup', end);
   canvas.addEventListener('pointercancel', end);
   canvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !ptrs.size) { hovering = false; marker.visible = false; } });
@@ -382,7 +441,7 @@ export function createWalker({ camera, canvas, grid, eye, pickRoot, isPickable =
     get pos() { return pos.clone(); },
     get yaw() { return yaw; },
     get pitch() { return pitch; },
-    get moving() { return !!route || keys.size > 0; },
-    setLook(y, p) { yaw = y; pitch = p; apply(); },
+    get moving() { return !!route || keys.size > 0 || easing || !!drag; },
+    setLook(y, p) { yaw = yawT = y; pitch = pitchT = p; easing = false; spinV = tiltV = 0; apply(); },
   };
 }
